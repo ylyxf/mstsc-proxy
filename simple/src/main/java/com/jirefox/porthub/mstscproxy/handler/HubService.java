@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
-import com.jcraft.jsch.JSchException;
 import com.jirefox.porthub.mstscproxy.ui.MessageTool;
 
 @EnableAsync
@@ -19,7 +18,7 @@ public class HubService {
 
 	@Value("${localPort}")
 	private Integer localPort;
-
+	
 	@Autowired
 	UiService uiService;
 

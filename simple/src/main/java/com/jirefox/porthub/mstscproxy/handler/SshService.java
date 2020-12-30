@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.Session;
 
 @Component
@@ -32,15 +34,29 @@ public class SshService {
 	@Value("${remotePorts}")
 	private String remotePorts;
 
+	@Value("${proxyHost}")
+	private String proxyHost;
+
+	@Value("${proxyPort}")
+	private Integer proxyPort;
+
 	private JSch jsch = new JSch();
 
 	public static Session l2rSession = null;
 
-	public String connect(String localHost,Integer localPort) throws JSchException {
+	public String connect(String localHost, Integer localPort) throws JSchException {
+		
 		Session session = jsch.getSession(user, host, port);
 		session.setConfig("StrictHostKeyChecking", "no");
 		session.setPassword(password);
 		session.setServerAliveInterval(30000);
+		
+		if(!StringUtils.isEmpty(proxyHost)&&!StringUtils.isEmpty(proxyPort)) {
+			ProxyHTTP proxyhttp = new  ProxyHTTP (proxyHost,proxyPort);
+			session.setProxy(proxyhttp);
+		}
+		
+		
 		session.connect(10000);
 		List<Integer> remotePorts = listAvailablePorts();
 		Integer distRemotePort = null;
